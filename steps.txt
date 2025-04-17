@@ -1,0 +1,154 @@
+Ensure node and npm are there (node -v, npm -v)
+
+BASIC FOLDER STRUCTURE (backend)
+
+- create a new folder (MERN-Bookstore) and open with editor
+- create empty .gitignore and README.md files (opnal)
+- create a sub folder backend
+- go to terminal:
+    >cd backend
+    >npm init -y 
+- This cmd will initiate a new Node.js proj by creating a package.json file with default vals in the backend folder
+    - npm init: starts an interactive process that asks you several questions about your project (like name, version, description, entry point, test command, git repository, keywords, author, and license).
+    - The -y flag: answers "yes" to all these questions and creates a package.json file with default values, skipping the interactive process.
+- go to package.json, add: 
+    "type": "module"
+- now again in terminal,
+    >npm i express nodemon (cors)
+- This cmd installs express (lt wt node frmwk to handle routing, HTTP req, middleware) and nodemon (to restart server autom when changes made)
+- go to package.json, replace the text under "scripts" with:
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+- now in backend create (config.js) and index.js, which serves as entry pt for backend
+- inside index.js:
+    import express from "express";
+    const app = express();
+    app.listen(5000, () => {
+        console.log("Server is running on port 5000");});
+- now in terminal run and check if msg is displayed:
+    >npm run dev
+- go to http://localhost:5000/, it will show
+    Cannot GET /
+- inspect it, go to network, you can see the details for localhost (404)
+- now we should use express to create a route for '/' (root route) in index.js:
+    app.get("/", (req, res) => {
+        console.log("root route has been requested");
+        res.send("Hello World");});
+- now on running npm run dev, console msg will be shown in terminal, res msg will be printed on screen
+
+MONGODB AND MONGOOSE 
+
+- There are many ways to connect (Atlas/cloud, compass/GUI, VS Code extension)
+- let's go with Atlas
+- sign in to mongodb atlas
+- can create a new user, say MERN-Bookstore_user (in Database Access)
+- go to clusters (Cluster0)
+- connect to Cluster0, then copy the conn str into config.js:
+    export const MONGO_URI = mongodb+srv://MERN-Bookstore_user:MERN-Bookstore_user@cluster0.ygqtq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+- now in terminal:
+    >npm i mongoose 
+- import mongoose and MONGO_URI in index.js
+- use mongoose to connect with mongodb:
+    mongoose.connect(MONGO_URI)
+    .then(() => {
+        console.log("Connected to MongoDB");
+        app.listen(5000, () => {
+            console.log("Server is running on port 5000");
+        });})
+    .catch((err) => {
+        console.log(err);
+    });
+- (line 26 and 27 should be cut and pasted after the "Connected to MongoDB" msg in index.js)
+
+BOOK MODEL WITH MONGOOSE
+
+- inside backend, create a folder models
+- inside models, create bookModel.js, inside which create the schema and export the model (Book)
+- go to index.js
+
+  CREATE
+- create a route to save a new book
+- run the server, open postman, and check by passing a sample json:
+    - choose POST 
+    - enter URL http://localhost:5000/books
+    - under Body, choose raw, json
+    - enter a sample json like:
+        {
+            "title": "Harry Potter",
+            "author": "JK Rowling",
+            "publishYear": 1999
+        }
+    - hit send, should show the res
+
+  READ
+- next create a route to get all books from db
+- again run server, open postman, and check by:
+    - choose GET 
+    - hit send, should show the res
+
+- next create a route to get one book by passing its id
+- again run server, open postman:
+    - open new request tab
+    - choose GET 
+    - pass http://localhost:5000/books/<id_of_one_of_the_already_stored_books>
+    - hit send, should show the json details of that book
+
+  UPDATE
+- next create a route to update a book by passing its id
+- again run server, open postman:
+    - open new request tab
+    - choose PUT 
+    - pass http://localhost:5000/books/<id_of_book_to_be_updated>
+    - under Body, choose raw, json
+    - enter a updated value:
+        {
+            "title": "Artemis Fowl",
+            "author": "Eoin Colfer",
+            "publishYear": 2004
+        }
+    - hit send, should show "Book updated successfully"
+    - also try with an invalid id, should show "Book not found"
+
+    DELETE
+- next create a route to delete a book by passing its id
+- again run server, open postman:
+    - open new request tab
+    - choose DELETE
+    - pass http://localhost:5000/books/<id_of_book_to_delete>
+    - hit send, should show "Book deleted successfully"
+    - also try with an invalid id, should show "Book not found"
+
+- for now we have only one model (bookModel.js), and all routes in index.js, but what if we have many models, each will have many routes
+- so better to store the routes sep 
+- inside backend create a folder routes, inside that create booksRoute.js and cut paste all the routes
+- above the routes:
+    import express from 'express';
+    import { Book } from '../models/bookModel';
+    const router = express.Router();
+- in the routes:
+    replace app with router
+- below the routes:
+    export default router;
+
+CORS policy
+- Cross Origin Resource Sharing- security mechsm
+- helps protect your data by making sure only approved websites can access certain APIs
+- ensure it is installed (npm i cors), then implement in index.js
+
+Frontend
+- >cd .. (to come back to root prompt)
+- >npm create vite@latest (fill the details- project name is frontend)
+- >cd frontend
+- go to tailwind css and follow the steps for vite (installation, config, import)
+- delete App.css (inside src)
+- go to App.jsx, delete text, type rafce (first install ES7+ extension)
+
+
+
+
+
+
+
+
+
+
